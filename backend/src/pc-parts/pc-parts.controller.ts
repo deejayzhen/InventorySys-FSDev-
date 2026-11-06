@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { PcPartsService } from './pc-parts.service';
 import { CreatePcPartDto } from './dto/create-pc-part.dto';
 import { UpdatePcPartDto } from './dto/update-pc-part.dto';
@@ -18,17 +27,20 @@ export class PcPartsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.pcPartsService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.pcPartsService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePcPartDto: UpdatePcPartDto) {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updatePcPartDto: UpdatePcPartDto,
+  ) {
     return this.pcPartsService.update(+id, updatePcPartDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.pcPartsService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.pcPartsService.remove(id);
   }
 }

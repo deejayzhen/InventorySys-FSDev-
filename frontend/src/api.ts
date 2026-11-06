@@ -19,3 +19,7 @@ export const getParts = async () => {
   const response = await api.get<PcPart[]>("/pc-parts");
   return response.data;
 };
+
+export const deletePart = async (id: number) => {
+  await api.delete(`/pc-parts/${id}`);
+};

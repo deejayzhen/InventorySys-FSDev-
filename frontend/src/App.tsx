@@ -1,10 +1,19 @@
-import { useQuery } from "@tanstack/react-query";
-import { getParts } from "./api";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { getParts, deletePart } from "./api";
 
 function App() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["parts"],
     queryFn: getParts,
+  });
+
+  const queryClient = useQueryClient();
+
+  const deleteMutation = useMutation({
+    mutationFn: deletePart,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["parts"] });
+    },
   });
 
   if (isLoading) return <p>Loading...</p>;
@@ -35,6 +44,11 @@ function App() {
               <td>{part.quantity}</td>
               <td>{part.price}</td>
               <td>{part.createdAt}</td>
+              <td>
+                <button onClick={() => deleteMutation.mutate(part.id)}>
+                  Delete
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>

@@ -1,11 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getParts, deletePart } from "./api";
+import { usePartStore } from "./store";
+import PartForm from "./PartForm";
 
 function App() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["parts"],
     queryFn: getParts,
   });
+  const editingPart = usePartStore((state) => state.editingPart);
+  const setEditingPart = usePartStore((state) => state.setEditingPart);
 
   const queryClient = useQueryClient();
 
@@ -22,6 +26,7 @@ function App() {
   return (
     <div className="p-8">
       <h1 className="text-3xl font-bold mb-4">PC Parts Inventory</h1>
+      <PartForm key={editingPart?.id ?? "new"} />
       <table className="w-full border">
         <thead>
           <tr>
@@ -32,6 +37,7 @@ function App() {
             <th>Quantity</th>
             <th>Price</th>
             <th>CreatedAt</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -48,6 +54,7 @@ function App() {
                 <button onClick={() => deleteMutation.mutate(part.id)}>
                   Delete
                 </button>
+                <button onClick={() => setEditingPart(part)}>Edit</button>
               </td>
             </tr>
           ))}

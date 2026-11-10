@@ -10,6 +10,8 @@ function App() {
   });
   const editingPart = usePartStore((state) => state.editingPart);
   const setEditingPart = usePartStore((state) => state.setEditingPart);
+  const search = usePartStore((state) => state.search);
+  const setSearch = usePartStore((state) => state.setSearch);
 
   const queryClient = useQueryClient();
 
@@ -23,10 +25,24 @@ function App() {
   if (isLoading) return <p>Loading...</p>;
   if (isError) return <p>Something went wrong</p>;
 
+  const term = search.toLowerCase();
+  const filteredParts = data?.filter(
+    (part) =>
+      part.name.toLowerCase().includes(term) ||
+      part.sku.toLowerCase().includes(term) ||
+      part.brand.toLowerCase().includes(term),
+  );
+
   return (
     <div className="p-8">
       <h1 className="text-3xl font-bold mb-4">PC Parts Inventory</h1>
       <PartForm key={editingPart?.id ?? "new"} />
+      <input
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Search by name, SKU or brand"
+        className="border rounded px-2 py-1 mb-4"
+      />
       <table className="w-full border">
         <thead>
           <tr>
@@ -41,7 +57,7 @@ function App() {
           </tr>
         </thead>
         <tbody>
-          {data?.map((part) => (
+          {filteredParts?.map((part) => (
             <tr key={part.id}>
               <td>{part.name}</td>
               <td>{part.sku}</td>

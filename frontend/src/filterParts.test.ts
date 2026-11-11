@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { PcPart } from "./api";
-import { filterParts } from "./filterParts";
+import { filterParts } from "./filterParts.ts";
 
 const parts: PcPart[] = [
   {

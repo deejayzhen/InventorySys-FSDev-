@@ -6,6 +6,8 @@ type PartStore = {
   setEditingPart: (part: PcPart | null) => void;
   search: string;
   setSearch: (search: string) => void;
+  isFormOpen: boolean;
+  setFormOpen: (open: boolean) => void;
 };
 
 export const usePartStore = create<PartStore>((set) => ({
@@ -13,4 +15,6 @@ export const usePartStore = create<PartStore>((set) => ({
   setEditingPart: (part) => set({ editingPart: part }),
   search: "",
   setSearch: (search) => set({ search }),
+  isFormOpen: false,
+  setFormOpen: (open) => set({ isFormOpen: open }),
 }));

@@ -7,11 +7,14 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from 'src/auth/auth.guard';
 import { PcPartsService } from './pc-parts.service';
 import { CreatePcPartDto } from './dto/create-pc-part.dto';
 import { UpdatePcPartDto } from './dto/update-pc-part.dto';
 
+@UseGuards(AuthGuard)
 @Controller('pc-parts')
 export class PcPartsController {
   constructor(private readonly pcPartsService: PcPartsService) {}

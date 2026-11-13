@@ -1,4 +1,5 @@
 import axios from "axios";
+import { useAuthStore } from "./authStore";
 
 const api = axios.create({
   baseURL: "http://localhost:3000",
@@ -13,6 +14,25 @@ export type PcPart = {
   quantity: number;
   price: number;
   createdAt: string;
+};
+
+api.interceptors.request.use((config) => {
+  const token = useAuthStore.getState().token;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+export const login = async (credentials: {
+  email: string;
+  password: string;
+}) => {
+  const response = await api.post<{ accessToken: string }>(
+    "/auth/login",
+    credentials,
+  );
+  return response.data.accessToken;
 };
 
 export const getParts = async () => {

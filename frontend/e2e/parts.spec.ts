@@ -3,7 +3,11 @@ import { expect, test } from "@playwright/test";
 test("adds a part", async ({ page }) => {
   const sku = `TEST-${Date.now()}`;
 
-  await page.goto("http://localhost:5173");
+  await page.goto("http://localhost:5173/login");
+  await page.getByPlaceholder("Email").fill("test@test.com");
+  await page.getByPlaceholder("Password").fill("secret123");
+  await page.getByRole("button", { name: "Login" }).click();
+  await expect(page.getByRole("button", { name: "Logout" })).toBeVisible();
   await page.getByRole("button", { name: "Add Part" }).click();
   await page.getByPlaceholder("Name", { exact: true }).fill("AMD RX 5700 XT");
   await page.getByPlaceholder("SKU", { exact: true }).fill(sku);

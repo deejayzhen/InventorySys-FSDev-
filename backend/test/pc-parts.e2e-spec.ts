@@ -13,6 +13,7 @@ describe('PC parts API', () => {
   let container: StartedPostgreSqlContainer;
   let app: INestApplication;
   let prisma: PrismaService;
+  let token: string;
   const part = {
     name: 'Ryzen 5 7600',
     sku: 'CPU-R5-7600',
@@ -36,6 +37,13 @@ describe('PC parts API', () => {
     await app.init();
 
     prisma = app.get(PrismaService);
+
+    const credentials = { email: 'test@test.com', password: 'secret123' };
+    await request(app.getHttpServer()).post('/auth/register').send(credentials);
+    const res = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send(credentials);
+    token = (res.body as { accessToken: string }).accessToken;
   }, 120000);
 
   afterAll(async () => {
@@ -50,6 +58,7 @@ describe('PC parts API', () => {
   it('creates a part', async () => {
     const response = await request(app.getHttpServer())
       .post('/pc-parts')
+      .set('Authorization', `Bearer ${token}`)
       .send(part)
       .expect(201);
 
@@ -59,6 +68,7 @@ describe('PC parts API', () => {
   it('rejects invalid data', async () => {
     await request(app.getHttpServer())
       .post('/pc-parts')
+      .set('Authorization', `Bearer ${token}`)
       .send({
         name: 'Ryzen 5 7600',
         sku: 'CPU-R5-7600',
@@ -71,22 +81,35 @@ describe('PC parts API', () => {
   });
 
   it('rejects a duplicate SKU', async () => {
-    await request(app.getHttpServer()).post('/pc-parts').send(part).expect(201);
-    await request(app.getHttpServer()).post('/pc-parts').send(part).expect(409);
+    await request(app.getHttpServer())
+      .post('/pc-parts')
+      .set('Authorization', `Bearer ${token}`)
+      .send(part)
+      .expect(201);
+    await request(app.getHttpServer())
+      .post('/pc-parts')
+      .set('Authorization', `Bearer ${token}`)
+      .send(part)
+      .expect(409);
   });
 
   it('returns 404 for a missing part', async () => {
-    await request(app.getHttpServer()).get('/pc-parts/999').expect(404);
+    await request(app.getHttpServer())
+      .get('/pc-parts/999')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(404);
   });
 
   it('updates a part', async () => {
     const created = await request(app.getHttpServer())
       .post('/pc-parts')
+      .set('Authorization', `Bearer ${token}`)
       .send(part)
       .expect(201);
 
     const response = await request(app.getHttpServer())
       .patch(`/pc-parts/${created.body.id}`)
+      .set('Authorization', `Bearer ${token}`)
       .send({ quantity: 10 })
       .expect(200);
 
@@ -96,7 +119,12 @@ describe('PC parts API', () => {
   it('returns 404 when updating a missing part', async () => {
     await request(app.getHttpServer())
       .patch('/pc-parts/999')
+      .set('Authorization', `Bearer ${token}`)
       .send({ quantity: 10 })
       .expect(404);
+  });
+
+  it('rejects requests without a token', async () => {
+    await request(app.getHttpServer()).get('/pc-parts').expect(401);
   });
 });

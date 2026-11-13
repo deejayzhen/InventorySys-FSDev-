@@ -9,7 +9,7 @@ import {
   ParseIntPipe,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard } from '../auth/auth.guard';
 import { PcPartsService } from './pc-parts.service';
 import { CreatePcPartDto } from './dto/create-pc-part.dto';
 import { UpdatePcPartDto } from './dto/update-pc-part.dto';
